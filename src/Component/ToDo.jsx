@@ -35,7 +35,7 @@ function ToDo() {
    * @param {String} item
    */
   function updateTodo(item) {
-    console.log("update");
+    console.log("update", item);
   }
   return (
     <>
