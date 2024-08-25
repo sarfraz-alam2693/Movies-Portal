@@ -61,7 +61,7 @@ function Login() {
           <h3>Log in</h3>
           <p className="separator"></p>
           <div className="input_box">
-            <label for="email">Email</label>
+            <label htmlFor="email">Email</label>
             <input
               type="email"
               id="email"
@@ -74,8 +74,8 @@ function Login() {
           </div>
           <div className="input_box">
             <div className="password_title">
-              <label for="password">Password</label>
-              <Link to={""}>Forgot Password?</Link>
+              <label htmlFor="password">Password</label>
+              <Link to={""}>htmlForgot Password?</Link>
             </div>
             <input
               type="password"

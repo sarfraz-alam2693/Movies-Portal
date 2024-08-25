@@ -81,7 +81,7 @@ function SignUp() {
           <p className="separator"></p>
 
           <div className="input_box">
-            <label for="email">Name</label>
+            <label htmlFor="email">Name</label>
             <input
               type="text"
               id="name"
@@ -94,7 +94,7 @@ function SignUp() {
 
           <div>
             <div className="gender_title">
-              <label for="gender">Gender</label>
+              <label htmlFor="gender">Gender</label>
             </div>
             <input
               type="radio"
@@ -122,7 +122,7 @@ function SignUp() {
 
           <div className="input_box">
             <div className="email_title">
-              <label for="email">Email ID</label>
+              <label htmlFor="email">Email ID</label>
             </div>
             <input
               type="text"
@@ -135,7 +135,7 @@ function SignUp() {
           </div>
           <div className="input_box">
             <div className="password_title">
-              <label for="password">Password</label>
+              <label htmlFor="password">Password</label>
             </div>
             <input
               type="password"
@@ -149,7 +149,7 @@ function SignUp() {
 
           <div className="input_box">
             <div className="address_title">
-              <label for="address">Address</label>
+              <label htmlFor="address">Address</label>
             </div>
             <textarea
               id="address"

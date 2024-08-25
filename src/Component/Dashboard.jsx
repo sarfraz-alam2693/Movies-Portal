@@ -1,10 +1,15 @@
 import { Container } from "react-bootstrap";
 // import Slider from "./Slider";
 import Gallery from "./Gallery";
+import { useSelector, useDispatch } from "react-redux";
+import { addTodo, listTodo, deleteTodo } from "../redux/slice/todoSlice";
 
 import Menu from "./Menu";
 
 function Dashboard() {
+  const todos = useSelector(listTodo);
+  console.log("todos", todos);
+
   return (
     <>
       <div>

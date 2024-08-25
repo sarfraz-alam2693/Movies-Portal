@@ -1,40 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button, Table } from "react-bootstrap";
+import { useSelector, useDispatch } from "react-redux";
+import { addTodo, listTodo, deleteTodo } from "../redux/slice/todoSlice";
 
 function ToDo() {
-  const savedToDoList = JSON.parse(localStorage.getItem("toDoList"));
   const [title, setTitle] = useState("");
-  const [toDoList, setToDoList] = useState(savedToDoList || []);
+  const dispatch = useDispatch();
+  const todos = useSelector(listTodo);
 
-  useEffect(() => {
-    localStorage.setItem("toDoList", JSON.stringify(toDoList));
-  }, [toDoList]);
+  const toDoList = todos?.payload?.todo || [];
 
-  function handleAdd() {
-    if (!title.trim()) {
-      alert("Title cannot be empty.");
-      return;
-    }
-    setToDoList((prevList) => {
-      return [...prevList, title];
-    });
-  }
-
-  /**
-   * Delete ToDo
-   * @param {event} e
-   * @param {String} item
-   */
-  function deleteTodo(e, item) {
-    e.preventDefault();
-    console.log("tyoeof", typeof item);
-    setToDoList((prevList) => prevList.filter((elem) => elem !== item));
-  }
-  /**
-   *  TODO:: Update ToDo
-   * @param {String} item
-   */
-  function updateTodo(item) {}
   return (
     <>
       <div className="container">
@@ -48,7 +23,7 @@ function ToDo() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
-            <Button onClick={handleAdd}>Add</Button>
+            <Button onClick={() => dispatch(addTodo(title))}>Add</Button>
           </div>
           <h2>ToDo List :</h2>
           <Table striped bordered hover>
@@ -65,16 +40,12 @@ function ToDo() {
                   <tr key={i}>
                     <td>{item}</td>
                     <td>
-                      <Button
-                        onClick={(e) => {
-                          deleteTodo(e, item);
-                        }}
-                      >
+                      <Button onClick={() => dispatch(deleteTodo(item))}>
                         Delete
                       </Button>
                     </td>
                     <td>
-                      <Button onClick={updateTodo(item)}>update</Button>
+                      <Button>update</Button>
                     </td>
                   </tr>
                 ))}
