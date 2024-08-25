@@ -34,9 +34,7 @@ function ToDo() {
    *  TODO:: Update ToDo
    * @param {String} item
    */
-  function updateTodo(item) {
-    console.log("update", item);
-  }
+  function updateTodo(item) {}
   return (
     <>
       <div className="container">
