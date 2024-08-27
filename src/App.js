@@ -7,6 +7,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Gallery from "./Component/Gallery";
 import Movie from "./Component/Movie";
 import ToDo from "./Component/ToDo";
+import ForgetPassword from "./Component/ForgetPassword";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/gallery" element={<Gallery />}></Route>
           <Route path="/create/movie" element={<Movie />}></Route>
           <Route path="create/todo" element={<ToDo />}></Route>
+          <Route path="/forgetpassword" element={<ForgetPassword />}></Route>
         </Routes>
       </BrowserRouter>
     </>

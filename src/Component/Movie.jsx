@@ -77,7 +77,6 @@ function Movie() {
         }
       });
   };
-
   // when i click eidt button open modal and set State of elow varriables
   const editMovieModal = (item) => {
     setShowCreateMovieModal(true);
@@ -87,7 +86,6 @@ function Movie() {
     setRating(item.rating);
     setModelButton("");
   };
-
   // update Movie api
   const handleUpdateMovie = () => {
     // Values coming from State
@@ -110,6 +108,7 @@ function Movie() {
         }
       });
   };
+  // delete movies
   const deleteMovies = (item) => {
     const conf = window.confirm("Are you sure want to Delete this record ?");
 

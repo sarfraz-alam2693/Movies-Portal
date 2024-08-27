@@ -35,6 +35,7 @@ function ForgetPassword() {
 
   function handleForgotPassword(e) {
     e.preventDefault();
+
     if (password !== c_password) {
       alert("Password Not match");
       return false;
@@ -109,7 +110,7 @@ function ForgetPassword() {
                   />
                 </div>
                 <button type="button" onClick={handleForgotPassword}>
-                  Forgot Password{" "}
+                  Forgot Password
                 </button>
               </>
             ) : (

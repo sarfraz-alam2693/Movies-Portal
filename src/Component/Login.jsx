@@ -75,7 +75,7 @@ function Login() {
           <div className="input_box">
             <div className="password_title">
               <label for="password">Password</label>
-              <Link to={""}>Forgot Password?</Link>
+              <Link to={"/forgetpassword"}>Forgot Password?</Link>
             </div>
             <input
               type="password"
