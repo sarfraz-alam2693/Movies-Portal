@@ -6,6 +6,9 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 
 function Movie() {
+  const API = "http://localhost:8000/api";
+  const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState(null);
   const [showCreateMovieModal, setShowCreateMovieModal] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -17,7 +20,7 @@ function Movie() {
   //Auto call once the page is load
   useEffect(() => {
     // GET Movie API
-    axios.get("http://localhost:8000/api/movie/list").then((response) => {
+    axios.get(`${API}/movie/list`).then((response) => {
       if (response.status === 200) {
         setMovieList(response.data.data);
       }
@@ -36,6 +39,14 @@ function Movie() {
     } else if (description.length < 5) {
       newErrors.description = "description must be at least 6 characters long.";
     }
+    if (!rating) {
+      newErrors.rating = "Rating is required.";
+    }
+
+    if (!image) {
+      newErrors.image = "Image is required.";
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -47,33 +58,32 @@ function Movie() {
   //Save Movie
   const handleSaveMovie = () => {
     if (!validateForm()) {
-      toast.error("Please correct your forms");
+      // toast.error("Please correct your forms");
       return;
     }
-    // Create Payload
-    const payload = {
-      title: title,
-      description: description,
-      rating: rating,
-    };
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("rating", rating);
+    formData.append("image", image);
 
-    //Invoke API
     axios
-      .post("http://localhost:8000/api/movie/create", payload)
+      .post(`${API}/movie/create`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
       .then(function (response) {
         // console.log("response", response);
         if (response.status === 200) {
-          // current data in response
-          // All table data in movieList
-          setMovieList((prevList) => {
-            return [...prevList, response.data.data];
-          });
-
+          setMovieList((prevList) => [...prevList, response.data.data]);
           toast.success(response.data.message);
           setShowCreateMovieModal(false);
           setTitle("");
           setDescription("");
           setRating("");
+          setImage(null);
+          setPreview("");
         }
       });
   };
@@ -115,19 +125,27 @@ function Movie() {
     if (conf) {
       // console.log("confirm");
 
-      axios
-        .delete(`http://localhost:8000/api/movie/delete/${item.id}`)
-        .then((response) => {
-          // console.log("response", response);
-          // console.log("response.data", response.status);
-          // console.log("response.data", typeof response.status);
-          if (response.status === 200 && response.data.success === true) {
-            setMovieList((prevList) =>
-              prevList.filter((elem) => elem.id !== item.id)
-            );
-            toast.success(response.data.message);
-          }
-        });
+      axios.delete(`${API}/movie/delete/${item.id}`).then((response) => {
+        if (response.status === 200 && response.data.success === true) {
+          setMovieList((prevList) =>
+            prevList.filter((elem) => elem.id !== item.id)
+          );
+          toast.success(response.data.message);
+        }
+      });
+    }
+  };
+
+  /**
+   * Function is used to handle image upload
+   * @param {Event} e
+   */
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    // console.log("handlefilechange", file);
+    if (file) {
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
     }
   };
   return (
@@ -156,16 +174,27 @@ function Movie() {
                   <th className="table-dark">Title</th>
                   <th className="table-dark">Description</th>
                   <th className="table-dark">Rating</th>
+                  <th className="table-dark">Image</th>
                   <th className="table-dark">Action</th>
                 </tr>
               </thead>
               <tbody>
+                {console.log("movieList", movieList)}
                 {movieList &&
                   movieList.map((item) => (
                     <tr key={item.id}>
                       <td>{item.title}</td>
                       <td>{item.description}</td>
                       <td>{item.rating}</td>
+                      <td>
+                        <img
+                          src={`http://localhost:8000/images/${item.image}`}
+                          alt=""
+                          height={50}
+                          width={50}
+                        />
+                      </td>
+
                       <td>
                         <Link onClick={() => editMovieModal(item)}>Edit</Link>
                         <br></br>
@@ -226,21 +255,51 @@ function Movie() {
                 <span className="error-text">{errors.description}</span>
               )}
             </div>
-            <label htmlFor="rating" className="form-label">
-              Rating
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              id="rating"
-              placeholder="Enter  Rating"
-              value={rating}
-              onChange={(e) => {
-                setRating(e.target.value);
-              }}
-            />
-            {errors.rating && (
-              <span className="error-text">{errors.rating}</span>
+            <div>
+              <label htmlFor="rating" className="form-label">
+                Rating
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                id="rating"
+                placeholder="Enter  Rating"
+                value={rating}
+                onChange={(e) => {
+                  setRating(e.target.value);
+                }}
+              />
+              {errors.rating && (
+                <span className="error-text">{errors.rating}</span>
+              )}
+            </div>
+            <div>
+              <label htmlFor="image" className="form-label">
+                Choose Image
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                className="form-control"
+                onChange={handleFileChange}
+              />
+              {errors.image && (
+                <span className="error-text">{errors.image}</span>
+              )}
+            </div>
+            {/* Image Preview */}
+            {preview && (
+              <div className="mt-3">
+                <img
+                  src={preview}
+                  alt="Movie"
+                  style={{
+                    width: "100px",
+                    maxHeight: "200px",
+                    objectFit: "contain",
+                  }}
+                />
+              </div>
             )}
           </form>
         </Modal.Body>
