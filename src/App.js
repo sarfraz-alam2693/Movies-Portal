@@ -8,6 +8,7 @@ import Gallery from "./Component/Gallery";
 import Movie from "./Component/Movie";
 import ToDo from "./Component/ToDo";
 import ForgetPassword from "./Component/ForgetPassword";
+import ImageUpload from "./Component/ImageUpload";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/create/movie" element={<Movie />}></Route>
           <Route path="create/todo" element={<ToDo />}></Route>
           <Route path="/forgetpassword" element={<ForgetPassword />}></Route>
+          <Route path="/imageupload" element={<ImageUpload />}></Route>
         </Routes>
       </BrowserRouter>
     </>

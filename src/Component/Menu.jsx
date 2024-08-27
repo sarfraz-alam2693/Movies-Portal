@@ -5,7 +5,7 @@ function Menu() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    navigate("/dashboard");
+    navigate("/");
   };
 
   return (
