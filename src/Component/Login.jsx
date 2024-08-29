@@ -8,6 +8,7 @@ function Login() {
   const [password, setpassword] = useState("");
   const navigate = useNavigate();
   const [errors, setErrors] = useState({});
+  // const [userId, setUserId] = useState("");
 
   const validateForm = () => {
     const newErrors = {};
@@ -38,19 +39,27 @@ function Login() {
       email: email,
       password: password,
     };
-    console.log("payload", payload);
     axios
       .post("http://localhost:8000/api/user/login", payload)
       .then((response) => {
-        // console.log("response", response);
-        if (response.data.success === false && response.status === 200) {
-          // console.log("error");
-          toast.error(response.data.message);
-        }
+        console.log(response);
+
         if (response.data.success === true && response.status === 200) {
+          const userData = {
+            email: email,
+            userId: response.data.user["id"],
+          };
+
+          localStorage.setItem("userData", JSON.stringify(userData));
+          console.log("userdata", userData);
+
           toast.success(response.data.message);
-          // Redirect use navigate
           navigate("/dashboard");
+        }
+        if (response.data.success === false && response.status === 200) {
+          toast.success(response.data.message);
+
+          // Redirect use navigate
         }
       });
   };
@@ -61,7 +70,7 @@ function Login() {
           <h3>Log in</h3>
           <p className="separator"></p>
           <div className="input_box">
-            <label for="email">Email</label>
+            <label htmlFor="email">Email</label>
             <input
               type="email"
               id="email"
@@ -74,7 +83,7 @@ function Login() {
           </div>
           <div className="input_box">
             <div className="password_title">
-              <label for="password">Password</label>
+              <label htmlFor="password">Password</label>
               <Link to={"/forgetpassword"}>Forgot Password?</Link>
             </div>
             <input
