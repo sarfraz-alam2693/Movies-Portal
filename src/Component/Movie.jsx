@@ -1,9 +1,10 @@
 import Menu from "./Menu";
-import { Modal, Button, Container, Table } from "react-bootstrap";
+import { Modal, Button, Container, Table, Row, Col } from "react-bootstrap";
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import Card from "react-bootstrap/Card";
 
 function Movie() {
   const API = "http://localhost:8000/api";
@@ -74,7 +75,6 @@ function Movie() {
         },
       })
       .then(function (response) {
-        // console.log("response", response);
         if (response.status === 200) {
           setMovieList((prevList) => [...prevList, response.data.data]);
           toast.success(response.data.message);
@@ -94,25 +94,37 @@ function Movie() {
     setTitle(item.title);
     setDescription(item.description);
     setRating(item.rating);
+    setPreview(`http://localhost:8000/images/${item.image}`);
     setModelButton("");
   };
-  // update Movie api
+
+  /**
+   * Update Movie API
+   */
   const handleUpdateMovie = () => {
-    // Values coming from State
-    const payload = {
-      title: title,
-      description: description,
-      rating: rating,
-    };
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("rating", rating);
+
+    if (image) {
+      formData.append("image", image);
+    }
+
     axios
-      .put(`http://localhost:8000/api/movie/update/${movieId}`, payload)
+      .post(`${API}/movie/update/${movieId}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
       .then((response) => {
         if (response.status === 200) {
-          toast.success(response.data.message[0]);
+          toast.success(response.data.message);
           setShowCreateMovieModal(false);
+          // update state of movieList
           setMovieList((prevList) =>
             prevList.map((elem) =>
-              elem.id === response.data.data.id ? response.data.data : elem
+              elem.id == response?.data?.data?.id ? response.data.data : elem
             )
           );
         }
@@ -142,7 +154,6 @@ function Movie() {
    */
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    // console.log("handlefilechange", file);
     if (file) {
       setImage(file);
       setPreview(URL.createObjectURL(file));
@@ -150,11 +161,13 @@ function Movie() {
   };
   return (
     <>
-      <Menu />
-      <Container>
-        <div className="row">
-          <div className="col-md-11">
-            <h2>Movie</h2>
+      <div style={{ backgroundColor: "#f8f9fa", padding: "40px 0" }}>
+        <Container>
+          <Menu />
+          <h2
+            style={{ textAlign: "center", margin: "20px 0", color: "#343a40" }}
+          >
+            Movie{" "}
             <Link
               onClick={() => {
                 setModelButton("addMovie");
@@ -168,51 +181,73 @@ function Movie() {
             >
               Add Movie
             </Link>
-            <Table striped bordered hover>
-              <thead>
-                <tr key="Movie Title">
-                  <th className="table-dark">Title</th>
-                  <th className="table-dark">Description</th>
-                  <th className="table-dark">Rating</th>
-                  <th className="table-dark">Image</th>
-                  <th className="table-dark">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {console.log("movieList", movieList)}
-                {movieList &&
-                  movieList.map((item) => (
-                    <tr key={item.id}>
-                      <td>{item.title}</td>
-                      <td>{item.description}</td>
-                      <td>{item.rating}</td>
-                      <td>
-                        <img
-                          src={`http://localhost:8000/images/${item.image}`}
-                          alt=""
-                          height={50}
-                          width={50}
-                        />
-                      </td>
-
-                      <td>
-                        <Link onClick={() => editMovieModal(item)}>Edit</Link>
-                        <br></br>
-                        <Link onClick={() => deleteMovies(item)}>Delete</Link>
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </Table>
-          </div>
-        </div>
-      </Container>
-
+          </h2>
+          <hr
+            style={{
+              width: "50%",
+              margin: "0 auto 20px auto",
+              borderColor: "#ccc",
+              borderColor: "#6c757d",
+            }}
+          />
+          <Row>
+            {movieList &&
+              movieList.map((item, index) => (
+                <Col key={index} md={3} className="mb-3">
+                  <Card style={{ width: "18rem" }}>
+                    <Card.Img
+                      variant="top"
+                      src={`http://localhost:8000/images/${item.image}`}
+                      alt={item.title}
+                      height="150px"
+                      width="50px"
+                    />
+                    <Card.Body>
+                      <Card.Title>
+                        {item.title}
+                        <span
+                          style={{
+                            fontWeight: "bold",
+                            fontSize: 12,
+                            color: "gold",
+                          }}
+                        >
+                          ({item.rating})
+                        </span>
+                      </Card.Title>
+                      <Card.Text
+                        style={{
+                          maxHeight: "80px", // Set a fixed height
+                          overflowY: "auto", // Enable vertical scrolling if content exceeds
+                          whiteSpace: "normal", // Prevent text from being truncated
+                        }}
+                      >
+                        {item.description}
+                      </Card.Text>
+                      <Button
+                        variant="primary"
+                        onClick={() => editMovieModal(item)}
+                        className="me-2"
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        variant="danger"
+                        onClick={() => deleteMovies(item)}
+                      >
+                        Delete
+                      </Button>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              ))}
+          </Row>
+        </Container>
+      </div>
       {/* Modal for creating a movie */}
       <Modal show={showCreateMovieModal} onHide={handleModalClose}>
         <Modal.Header closeButton>
           <Modal.Title>
-            {/* {console.log("modelButton", modelButton)} */}
             {modelButton === "addMovie" ? "Create Movie" : "Update Movie"}
           </Modal.Title>
         </Modal.Header>

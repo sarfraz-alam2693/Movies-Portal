@@ -16,7 +16,7 @@ function Menu() {
         <Nav className="me-auto">
           <Nav.Link href="/create/movie">Movies</Nav.Link>
           <Nav.Link href="/create/todo">ToDo</Nav.Link>
-          <Nav.Link href="fav/movie">Fav-Movies</Nav.Link>
+          <Nav.Link href="/fav/movie">Fav-Movies</Nav.Link>
           <Nav.Link
             as="button"
             onClick={handleLogout}
