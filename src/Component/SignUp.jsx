@@ -4,6 +4,7 @@ import React from "react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 function SignUp() {
   const [name, setName] = useState("");
@@ -13,6 +14,7 @@ function SignUp() {
   const [address, setAddress] = useState("");
   const [selectedValue, setSelectedValue] = useState("male");
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   const validateForm = () => {
     const newErrors = {};
@@ -71,6 +73,7 @@ function SignUp() {
           setpaswd("");
           setGender("");
         }
+        navigate("/");
       });
   };
   return (

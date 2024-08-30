@@ -14,14 +14,13 @@ function FavMovie() {
 
   useEffect(() => {
     axios.get(`${API}/movie/list`).then((response) => {
-      //   console.log("response", response);
+      console.log("response", response);
       setFavMovie(response.data.data);
     });
   }, []);
 
   //onchange title
   const handleSelectMOvies = (e) => {
-    console.log("e.target.value", e.target.value);
     if (!e.target.value) {
       toast.error("Please select movie");
       setisMovieCard(false);
@@ -29,12 +28,16 @@ function FavMovie() {
     }
 
     const movieId = e.target.value;
+    // console.log("typeof", typeof movieId);
     setMovieId(movieId);
-    const selectedMovie = favMovieList.find((elem) => elem.id === movieId);
+    console.log("favMovieList", favMovieList);
+
+    const selectedMovie = favMovieList.find((elem) => elem.id == movieId);
+    console.log("title", selectedMovie);
+
     setFavTitle(selectedMovie.title);
     setdescription(selectedMovie.description);
     setmovieImage(selectedMovie.image);
-
     setisMovieCard(true);
   };
 
