@@ -1,9 +1,7 @@
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 function MovieCard(props) {
-  console.log("props", props);
   const { title, description, movieImage } = props.data;
-  // const title = props.data.title
   return (
     <Card style={{ width: "18rem" }}>
       <Card.Img
@@ -12,7 +10,14 @@ function MovieCard(props) {
       />
       <Card.Body>
         <Card.Title>{title}</Card.Title>
-        <Card.Text>{description}</Card.Text>
+        <Card.Text
+          style={{
+            maxHeight: "80px", // Set a fixed height
+            overflowY: "auto", // Enable vertical scrolling if content exceeds
+          }}
+        >
+          {description}
+        </Card.Text>
         <Button variant="info">Movie Details</Button>
       </Card.Body>
     </Card>
