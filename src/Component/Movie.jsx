@@ -99,7 +99,7 @@ function Movie() {
   };
 
   /**
-   * Update Movie API
+   * Update Movie API use image input then method post
    */
   const handleUpdateMovie = () => {
     const formData = new FormData();
@@ -121,6 +121,7 @@ function Movie() {
         if (response.status === 200) {
           toast.success(response.data.message);
           setShowCreateMovieModal(false);
+          setImage(null);
           // update state of movieList
           setMovieList((prevList) =>
             prevList.map((elem) =>
@@ -130,7 +131,9 @@ function Movie() {
         }
       });
   };
-  // delete movies
+  /**
+   * delete movies
+   */
   const deleteMovies = (item) => {
     const conf = window.confirm("Are you sure want to Delete this record ?");
 
