@@ -1,6 +1,6 @@
 import Menu from "./Menu";
-import { Modal, Button, Container, Table, Row, Col } from "react-bootstrap";
-import { useState, useEffect } from "react";
+import { Modal, Button, Container, Row, Col } from "react-bootstrap";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { Link } from "react-router-dom";
@@ -18,14 +18,18 @@ function Movie() {
   const [movieList, setMovieList] = useState([]);
   const [movieId, setMovieId] = useState([]);
   const [modelButton, setModelButton] = useState("");
+  const [search, setSearch] = useState("");
+
   //Auto call once the page is load
-  useEffect(() => {
-    // GET Movie API
+  const getMovieList = () => {
     axios.get(`${API}/movie/list`).then((response) => {
       if (response.status === 200) {
         setMovieList(response.data.data);
       }
     });
+  };
+  useEffect(() => {
+    getMovieList();
   }, []);
 
   //Validation
@@ -162,29 +166,76 @@ function Movie() {
       setPreview(URL.createObjectURL(file));
     }
   };
+
+  /**
+   * Search Movies
+   */
+  const handleSearchButton = () => {
+    console.log("search", search);
+    if (!search.length > 0) {
+      toast.error("Search your movie");
+    }
+
+    axios
+      .get(`http://localhost:8000/api/searchmovie?title=${search}`)
+      .then((response) => {
+        console.log("response", response);
+        setMovieList(response.data.data);
+      });
+  };
+  const handleCloseSearch = () => {
+    console.log("xxxxxx");
+    getMovieList();
+  };
+
   return (
     <>
       <div style={{ backgroundColor: "#f8f9fa", padding: "40px 0" }}>
         <Container>
           <Menu />
-          <h2
-            style={{ textAlign: "center", margin: "20px 0", color: "#343a40" }}
-          >
-            Movie{" "}
-            <Link
-              onClick={() => {
-                setModelButton("addMovie");
-                setMovieId("");
-                setTitle("");
-                setDescription("");
-                setRating("");
-                setShowCreateMovieModal(true);
-              }}
-              className="btn btn-primary float-end"
-            >
-              Add Movie
-            </Link>
-          </h2>
+          <Row>
+            <Col md={4} className="mb-4">
+              <h2>Movie</h2>
+            </Col>
+            <Col md={4} className="md-4">
+              <Link
+                onClick={() => {
+                  setModelButton("addMovie");
+                  setMovieId("");
+                  setTitle("");
+                  setDescription("");
+                  setRating("");
+                  setShowCreateMovieModal(true);
+                }}
+                className="btn btn-primary"
+              >
+                Add Movie
+              </Link>
+            </Col>
+            <Col md={2} className="md-2">
+              <input
+                type="search"
+                id="search"
+                className="form-control"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </Col>
+            <Col md={1} className="md-1">
+              <Button
+                className="btn btn-danger pull-right"
+                onClick={handleCloseSearch}
+              >
+                X
+              </Button>
+            </Col>
+            <Col>
+              <Button md={1} className="md-1" onClick={handleSearchButton}>
+                Search
+              </Button>
+            </Col>
+          </Row>
+
           <hr
             style={{
               width: "50%",

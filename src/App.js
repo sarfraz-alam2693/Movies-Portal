@@ -10,6 +10,7 @@ import ToDo from "./Component/ToDo";
 import ForgetPassword from "./Component/ForgetPassword";
 import ImageUpload from "./Component/ImageUpload";
 import FavMovie from "./Component/FavMovie";
+import Blog from "./Component/Blog";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path="/forgetpassword" element={<ForgetPassword />}></Route>
           <Route path="/imageupload" element={<ImageUpload />}></Route>
           <Route path="/fav/movie" element={<FavMovie />}></Route>
+          <Route path="/blog" element={<Blog />}></Route>
         </Routes>
       </BrowserRouter>
     </>
