@@ -17,6 +17,7 @@ function Menu() {
           <Nav.Link href="/create/movie">Movies</Nav.Link>
           <Nav.Link href="/create/todo">ToDo</Nav.Link>
           <Nav.Link href="/fav/movie">Fav-Movies</Nav.Link>
+          <Nav.Link href="/blog">Blog</Nav.Link>
           <Nav.Link
             as="button"
             onClick={handleLogout}

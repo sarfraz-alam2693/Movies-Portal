@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import MovieCard from "./MovieCard";
 import { Table, Button } from "react-bootstrap";
 import Loader from "./Loader";
+import Menu from "./Menu";
 
 function FavMovie() {
   const API = "http://localhost:8000/api";
@@ -91,80 +92,87 @@ function FavMovie() {
 
   return (
     <>
-      <div className="container">
-        {loading ? (
-          <Loader />
-        ) : (
-          <div>
-            <h2>Fav Movies</h2>
-            <div className="row">
-              <div className="col-md-4">
-                <select
-                  onChange={handleSelectMOvies}
-                  className="form-select"
-                  aria-label="Default select example"
-                >
-                  <option value={""}>Select</option>
-                  {favMovieList &&
-                    favMovieList.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.title}
-                      </option>
-                    ))}
-                </select>
-                {
-                  // condtion ? true : false;
-                  isMovieCard === true ? (
-                    <div className="col-md-4">
-                      <MovieCard data={{ title, description, movieImage }} />
-                    </div>
-                  ) : (
-                    ""
-                  )
-                }
-              </div>
-              <div className="col-md-2">
-                <button className="btn btn-primary" onClick={handleAddFavMovie}>
-                  Add Fav MOvies
-                </button>
-              </div>
-              <div className="col-md-6">
-                <h2>Favorite Movies</h2>
-                <Table striped bordered hover>
-                  <thead>
-                    <tr>
-                      <th className="table-dark">Name</th>
-                      <th className="table-dark">Movie Title</th>
-                      <th className="table-dark">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {movie && movie.length > 0 ? (
-                      movie.map((item, index) => (
-                        <tr key={index}>
-                          <td>{item.name}</td>
-                          <td>{item.title}</td>
-                          <td>
-                            <Button
-                              variant="danger"
-                              onClick={(e) => handleMoviesDelete(item, e)}
-                            >
-                              Delete
-                            </Button>
-                          </td>
-                        </tr>
-                      ))
+      <div style={{ backgroundColor: "#f8f9fa", padding: "40px 0" }}>
+        <div className="container">
+          <Menu />
+          {loading ? (
+            <Loader />
+          ) : (
+            <div>
+              <h2>Fav Movies</h2>
+              <div className="row">
+                <div className="col-md-4">
+                  <select
+                    onChange={handleSelectMOvies}
+                    className="form-select"
+                    aria-label="Default select example"
+                  >
+                    <option value={""}>Select</option>
+                    {favMovieList &&
+                      favMovieList.map((item) => (
+                        <option key={item.id} value={item.id}>
+                          {item.title}
+                        </option>
+                      ))}
+                  </select>
+                  {
+                    // condtion ? true : false;
+                    isMovieCard === true ? (
+                      <div className="col-md-4">
+                        <MovieCard data={{ title, description, movieImage }} />
+                      </div>
                     ) : (
+                      ""
+                    )
+                  }
+                </div>
+                <div className="col-md-2">
+                  <button
+                    className="btn btn-primary"
+                    onClick={handleAddFavMovie}
+                  >
+                    Add Fav MOvies
+                  </button>
+                </div>
+                <div className="col-md-6">
+                  <h2>Favorite Movies</h2>
+                  <Table striped bordered hover>
+                    <thead>
                       <tr>
-                        <td colSpan="4">No favorite movies found.</td>
+                        <th className="table-dark">Name</th>
+                        <th className="table-dark">Movie Title</th>
+                        <th className="table-dark">Action</th>
                       </tr>
-                    )}
-                  </tbody>
-                </Table>
+                    </thead>
+                    <tbody>
+                      {movie && movie.length > 0 ? (
+                        movie.map((item, index) => (
+                          <tr key={index}>
+                            <td>{item.name}</td>
+                            <td>{item.title}</td>
+                            <td>
+                              <Button
+                                variant="danger"
+                                onClick={(e) => handleMoviesDelete(item, e)}
+                              >
+                                Delete
+                              </Button>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan="4">No favorite movies found.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </Table>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
+        f
       </div>
     </>
   );
