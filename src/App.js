@@ -27,6 +27,7 @@ function App() {
           <Route path="/imageupload" element={<ImageUpload />}></Route>
           <Route path="/fav/movie" element={<FavMovie />}></Route>
           <Route path="/blog" element={<Blog />}></Route>
+          {/* // path declares Url  */}
         </Routes>
       </BrowserRouter>
     </>

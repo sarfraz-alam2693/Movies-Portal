@@ -20,13 +20,23 @@ function Movie() {
   const [modelButton, setModelButton] = useState("");
   const [search, setSearch] = useState("");
 
+  // get Token in local storage
+  const token = localStorage.getItem("token");
   //Auto call once the page is load
   const getMovieList = () => {
-    axios.get(`${API}/movie/list`).then((response) => {
-      if (response.status === 200) {
-        setMovieList(response.data.data);
-      }
-    });
+    axios
+      .get(`${API}/movie/list`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Send the token in the Authorization header
+        },
+      })
+      .then((response) => {
+        console.log("response", response);
+
+        if (response.status === 200) {
+          setMovieList(response.data.data);
+        }
+      });
   };
   useEffect(() => {
     getMovieList();
@@ -75,7 +85,8 @@ function Movie() {
     axios
       .post(`${API}/movie/create`, formData, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          // "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
         },
       })
       .then(function (response) {
@@ -89,6 +100,10 @@ function Movie() {
           setImage(null);
           setPreview("");
         }
+      })
+      .catch((err) => {
+        console.log("Error>>>>>>>", err.message);
+        toast.error(err.message);
       });
   };
   // when i click eidt button open modal and set State of elow varriables
@@ -119,9 +134,12 @@ function Movie() {
       .post(`${API}/movie/update/${movieId}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
         },
       })
       .then((response) => {
+        console.log("checking", response);
+
         if (response.status === 200) {
           toast.success(response.data.message);
           setShowCreateMovieModal(false);
@@ -129,7 +147,7 @@ function Movie() {
           // update state of movieList
           setMovieList((prevList) =>
             prevList.map((elem) =>
-              elem.id == response?.data?.data?.id ? response.data.data : elem
+              elem.id === response?.data?.data?.id ? response.data.data : elem
             )
           );
         }
@@ -144,14 +162,20 @@ function Movie() {
     if (conf) {
       // console.log("confirm");
 
-      axios.delete(`${API}/movie/delete/${item.id}`).then((response) => {
-        if (response.status === 200 && response.data.success === true) {
-          setMovieList((prevList) =>
-            prevList.filter((elem) => elem.id !== item.id)
-          );
-          toast.success(response.data.message);
-        }
-      });
+      axios
+        .delete(`${API}/movie/delete/${item.id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`, // Send the token in the Authorization header
+          },
+        })
+        .then((response) => {
+          if (response.status === 200 && response.data.success === true) {
+            setMovieList((prevList) =>
+              prevList.filter((elem) => elem.id !== item.id)
+            );
+            toast.success(response.data.message);
+          }
+        });
     }
   };
 
@@ -177,7 +201,11 @@ function Movie() {
     }
 
     axios
-      .get(`http://localhost:8000/api/searchmovie?title=${search}`)
+      .get(`http://localhost:8000/api/searchmovie?title=${search}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Send the token in the Authorization header
+        },
+      })
       .then((response) => {
         console.log("response", response);
         setMovieList(response.data.data);
@@ -240,7 +268,7 @@ function Movie() {
             style={{
               width: "50%",
               margin: "0 auto 20px auto",
-              borderColor: "#ccc",
+              // borderColor: "#ccc",
               borderColor: "#6c757d",
             }}
           />

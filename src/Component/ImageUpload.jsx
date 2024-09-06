@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+const token = localStorage.getItem("token");
 
 const ImageUpload = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -25,6 +26,7 @@ const ImageUpload = () => {
       .post(`http://localhost:8000/api/image/upload`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
         },
       })
       .then((response) => {

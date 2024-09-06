@@ -6,6 +6,8 @@ import { Table, Button } from "react-bootstrap";
 import Loader from "./Loader";
 import Menu from "./Menu";
 
+const token = localStorage.getItem("token");
+
 function FavMovie() {
   const API = "http://localhost:8000/api";
   const [loading, setLoading] = useState(true);
@@ -19,19 +21,31 @@ function FavMovie() {
 
   useEffect(() => {
     //Get the list of movie for dropdown
-    axios.get(`${API}/movie/list`).then((response) => {
-      setFavMovie(response.data.data);
-    });
+    axios
+      .get(`${API}/movie/list`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        setFavMovie(response.data.data);
+      });
 
     //List of user movie
     const userData = JSON.parse(localStorage.getItem("userData"));
     let userId = userData.userId;
-    axios.get(`${API}/user/favmovie/${userId}`).then((response) => {
-      if (response.status === 200 && response.data.success === true) {
-        setmovie(response.data.result);
-        setLoading(false);
-      }
-    });
+    axios
+      .get(`${API}/user/favmovie/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        if (response.status === 200 && response.data.success === true) {
+          setmovie(response.data.result);
+          setLoading(false);
+        }
+      });
   }, []);
 
   //onchange title
@@ -44,8 +58,11 @@ function FavMovie() {
 
     const movieId = e.target.value;
     setMovieId(movieId);
+    console.log("type", typeof movieId);
 
-    const selectedMovie = favMovieList.find((elem) => elem.id == movieId);
+    const selectedMovie = favMovieList.find(
+      (elem) => elem.id.toString() == movieId
+    );
 
     setFavTitle(selectedMovie.title);
     setdescription(selectedMovie.description);
@@ -61,13 +78,19 @@ function FavMovie() {
       title: title,
       userId: userData.userId,
     };
-    axios.post(`${API}/user-movie/store`, payload).then((response) => {
-      console.log("response", response.data.data[0]);
-      if (response.status === 200) {
-        toast.success(response.data.message);
-        setmovie((prevList) => [...prevList, response.data.data[0]]);
-      }
-    });
+    axios
+      .post(`${API}/user-movie/store`, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        console.log("response", response.data.data[0]);
+        if (response.status === 200) {
+          toast.success(response.data.message);
+          setmovie((prevList) => [...prevList, response.data.data[0]]);
+        }
+      });
   };
 
   /**
@@ -78,15 +101,21 @@ function FavMovie() {
     const conf = window.confirm("Are you sure want to Delete this record ?");
     if (conf) {
       const movieId = item.id;
-      axios.delete(`${API}/favmovie/delete/${movieId}`).then((response) => {
-        console.log("response", response);
-        if (response.data.success && response.status === 200) {
-          toast.success(response.data.message);
-          setmovie((prevList) => {
-            return prevList.filter((elem) => elem.id != movieId);
-          });
-        }
-      });
+      axios
+        .delete(`${API}/favmovie/delete/${movieId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          console.log("response", response);
+          if (response.data.success && response.status === 200) {
+            toast.success(response.data.message);
+            setmovie((prevList) => {
+              return prevList.filter((elem) => elem.id != movieId);
+            });
+          }
+        });
     }
   };
 
