@@ -49,6 +49,9 @@ function Login() {
             email: email,
             userId: response.data.user["id"],
           };
+          // set token by api response
+          localStorage.setItem("token", response.data.token);
+          // console.log("token", token);
 
           localStorage.setItem("userData", JSON.stringify(userData));
           console.log("userdata", userData);

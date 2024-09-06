@@ -1,23 +1,22 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Button, Card, Col, Container, Modal, Row } from "react-bootstrap";
-import bike from "../assets/images/bike.jpg";
 import Menu from "./Menu";
 import { toast } from "react-toastify";
 
 function Blog() {
-  const [blog, setblog] = useState([]);
+  const [blogList, setBlogList] = useState([]);
   const [blogId, setBlogId] = useState([]);
-
   const [showModal, setShowModal] = useState(false);
-  const [showCreateMovieModal, setShowCreateMovieModal] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [preview, setPreview] = useState("");
   const [errors, seterror] = useState("");
   const [image, setImage] = useState(null);
   const [modelButton, setModelButton] = useState("");
+  const [search, setSearch] = useState("");
 
+  const token = localStorage.getItem("token");
   const handleShow = () => {
     setShowModal(true);
     setTitle("");
@@ -27,14 +26,32 @@ function Blog() {
     seterror("");
     setModelButton("Add Blog");
   };
-
+  const getBlogList = () => {
+    axios
+      .get(`http://localhost:8000/api/blogs`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        console.log("response", response);
+        if (response.status === 200 && response.data.success === true) {
+          setBlogList(response.data.data);
+        }
+      });
+  };
   useEffect(() => {
-    axios.get(`http://localhost:8000/api/blogs`).then((response) => {
-      // console.log("response", response);
-      if (response.status === 200 && response.data.success === true) {
-        setblog(response.data.data);
-      }
-    });
+    getBlogList();
+
+    document
+      .querySelector('input[type="search"]')
+      .addEventListener("input", function () {
+        if (this.value === "") {
+          getBlogList();
+          // search logic here
+          // this function will be executed when the search input is cleared
+        }
+      });
   }, []);
   const editMovieModal = (item) => {
     console.log("item", item);
@@ -46,7 +63,7 @@ function Blog() {
     setPreview(`http://localhost:8000/images/${item.image}`);
   };
 
-  const handleSaveMovie = () => {
+  const handleSaveBlog = () => {
     const userData = JSON.parse(localStorage.getItem("userData"));
     const userId = userData.userId;
     const formData = new FormData();
@@ -59,11 +76,15 @@ function Blog() {
     // console.log("formdata", formData);
 
     axios
-      .post(`http://localhost:8000/api/blog/store`, formData)
+      .post(`http://localhost:8000/api/blog/store`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((response) => {
-        console.log("response", response);
         if (response.status === 200) {
           toast.success(response.data.message);
+          setBlogList((previewList) => [...previewList, response.data.data]);
         }
         setShowModal(false);
       });
@@ -86,19 +107,25 @@ function Blog() {
     let conf = window.confirm("Are you sure want to delete");
     if (conf) {
       axios
-        .delete(`http://localhost:8000/api/blog/delete/${blogId}`)
+        .delete(`http://localhost:8000/api/blog/delete/${blogId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
         .then((response) => {
+          console.log("response", response);
+
           if (response.status === 200) {
             toast.error(response.data.message);
-            setblog((previewList) => {
-              return previewList.filter((elem) => elem.id != blogId);
+            setBlogList((previewList) => {
+              return previewList.filter((elem) => elem.id !== blogId); //???
             });
           }
         });
     }
   };
 
-  const handleUpdateMovie = () => {
+  const handleUpdateBlog = () => {
     const formData = new FormData();
     formData.append("title", title);
     formData.append("description", description);
@@ -111,69 +138,122 @@ function Blog() {
       .post(`http://localhost:8000/api/blog/edit/${blogId}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
         },
       })
       .then((response) => {
         console.log("response", response);
-
         if (response.status === 200) {
+          setBlogList((prevList) =>
+            prevList.map((elem) =>
+              elem.id == blogId ? response.data.data : elem
+            )
+          );
           setShowModal(false);
           toast.success(response.data.message);
-
           setImage(null);
         }
       });
   };
+  /**
+   * Blog Search
+   */
+  const handleSearchButton = () => {
+    console.log("search", search);
+    if (!search.length > 0) {
+      toast.error("Search your Blog");
+    }
+
+    axios
+      .get(`http://localhost:8000/api/searchblog?searchData=${search}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        console.log("response", response);
+        setBlogList(response.data.data);
+      });
+  };
+  // Close x search
+  const handleCloseSearch = () => {
+    getBlogList();
+  };
+
   return (
     <>
       <div style={{ backgroundColor: "#f8f9fa", padding: "40px 0" }}>
         <Container>
           <Menu />
-          <h2>Blogs</h2>
           <Row>
-            <Col className="text-end">
+            <Col md={2}>
               <Button className="btn btn-primary" onClick={handleShow}>
                 Add Blog
               </Button>
             </Col>
           </Row>
+          <Row className="justify-content-end">
+            <Col md={2} className="d-flex align-items-center">
+              <input
+                type="search"
+                id="search"
+                className="form-control me-2"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              <Button className="btn btn-danger" onClick={handleCloseSearch}>
+                X
+              </Button>
+            </Col>
 
+            <Col md={1}>
+              <Button onClick={handleSearchButton}>Search</Button>
+            </Col>
+          </Row>
+          <hr />
           <Row>
-            {blog && blog.length > 0 ? (
-              blog.map((item, index) => (
-                <Col lg="4" md="6" sm="12" key={index} className="mb-4">
-                  <Card>
+            {blogList && blogList.length > 0 ? (
+              blogList.map((item, index) => (
+                <Col lg="3" md="3" sm="3" key={index} className="mb-2">
+                  <Card
+                    style={{
+                      height: "380px", // Set a fixed height for the card
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
                     <Card.Img
                       variant="top"
                       src={`http://localhost:8000/images/${item.image}`}
                       alt={item.title}
+                      style={{ height: "150px", objectFit: "cover" }} // Adjust the image height and object-fit to maintain aspect ratio
                     />
-                    <Card.Body>
+                    <Card.Body className="d-flex flex-column">
                       <Card.Title>{item.title}</Card.Title>
-                      <Card.Text>{item.description}</Card.Text>
-                      <Card.Footer>
-                        <small className="text-muted">
-                          Created: {item.created_at}
-                        </small>
-                        <br />
-                        <small className="text-muted">
-                          Updated: {item.updated_at}
-                        </small>
-                        <div className="d-flex justify-content-between mt-3">
-                          <Button
-                            variant="info"
-                            onClick={() => editMovieModal(item)}
-                          >
-                            Edit
-                          </Button>
-                          <Button
-                            variant="danger"
-                            onClick={() => handleDeleteBlog(item)}
-                          >
-                            Delete
-                          </Button>
-                        </div>
+                      <Card.Footer
+                        style={{
+                          maxHeight: "80px",
+                          overflowY: "auto",
+                          whiteSpace: "normal",
+                          flexGrow: 1, // Make the footer flexible to take up space
+                        }}
+                      >
+                        {item.description}
                       </Card.Footer>
+                      <div className="mt-auto d-flex justify-content-between">
+                        <Button
+                          variant="info"
+                          onClick={() => editMovieModal(item)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="danger"
+                          onClick={() => handleDeleteBlog(item)}
+                        >
+                          Delete
+                        </Button>
+                      </div>
                     </Card.Body>
                   </Card>
                 </Col>
@@ -267,16 +347,14 @@ function Blog() {
               </Button>
 
               {modelButton === "Add Blog" ? (
-                <Button variant="primary" onClick={handleSaveMovie}>
+                <Button variant="primary" onClick={handleSaveBlog}>
                   Save Blog
                 </Button>
               ) : (
-                <Button variant="primary" onClick={handleUpdateMovie}>
+                <Button variant="primary" onClick={handleUpdateBlog}>
                   Update Blog
                 </Button>
               )}
-
-              {/* <Button onClick={handleSaveBlog}>Save Blog</Button> */}
             </Modal.Footer>
           </Modal>
         </Container>
